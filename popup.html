@@ -52,6 +52,7 @@
           <div class="select-wrap">
             <select id="courseSelect">
               <option value="" disabled>Select a course</option>
+              <option value="ap_biology">AP Biology</option>
               <option value="ap_physics_2">AP Physics 2</option>
               <option value="ap_english_language">AP English Language &amp; Composition</option>
             </select>
@@ -63,16 +64,16 @@
       <div class="tool-card" id="hiderCard" style="display: none;">
         <div class="tool-row" style="margin-bottom: 0; gap: 16px;">
           <div class="tool-info" style="flex: 1; min-width: 0;">
-            <span class="tool-title">Answer Hider Panel</span>
-            <span class="tool-subtitle">Show/hide the on-page toggle</span>
-            <span class="tool-note" id="hiderNote" style="display: block; margin-top: 6px;">Use panel to hide answers</span>
+            <span class="tool-title">Answer Hider</span>
+            <span class="tool-subtitle">Hides correct and incorrect markers</span>
+            <span class="tool-note" id="hiderNote" style="display: none;"></span>
           </div>
           <div style="display: flex; align-items: center; gap: 16px; flex-shrink: 0;">
             <label class="toggle">
               <input type="checkbox" id="hiderToggle">
               <span class="toggle-track"></span>
             </label>
-            <span class="tool-badge" id="hiderBadge" style="width: 60px; text-align: center; flex-shrink: 0;">Visible</span>
+            <span class="tool-badge" id="hiderBadge" style="display: none;">Visible</span>
           </div>
         </div>
       </div>

@@ -638,6 +638,8 @@
 
     function formatCourseLabel(course) {
         switch (course) {
+            case 'ap_biology':
+                return 'AP Biology';
             case 'ap_physics_2':
                 return 'AP Physics 2';
             case 'ap_english_language':
