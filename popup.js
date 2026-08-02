@@ -1,6 +1,6 @@
 /**
- * CollegeBoard Nexus — Popup Script
- * 
+ * Nib — Popup Script
+ *
  * Uses chrome.scripting.executeScript with allFrames to collect questions
  * from ALL frames simultaneously (including Learnosity iframes).
  * Results are merged and de-duplicated.
@@ -26,11 +26,152 @@
     const hiderToggle = document.getElementById('hiderToggle');
     const hiderBadge = document.getElementById('hiderBadge');
     const hiderNote = document.getElementById('hiderNote');
+    const settingsBtn = document.getElementById('settingsBtn');
+    const settingsPanel = document.getElementById('settingsPanel');
+    const apiKeyInput = document.getElementById('apiKeyInput');
+    const saveApiKeyBtn = document.getElementById('saveApiKeyBtn');
+    const settingsStatus = document.getElementById('settingsStatus');
+    const aiPanel = document.getElementById('aiPanel');
+    const aiCountRow = document.getElementById('aiCountRow');
+    const aiCount = document.getElementById('aiCount');
+    const generateBtn = document.getElementById('generateBtn');
+    const aiStatus = document.getElementById('aiStatus');
+    const aiOutput = document.getElementById('aiOutput');
+    const modeChips = document.querySelectorAll('.chip[data-mode]');
 
     let extractedData = null;
+    let aiMode = 'similar';
+
+    // ─── Settings (API key) ──────────────────────────────────────
+    function initSettings() {
+        if (!settingsBtn || !settingsPanel) return;
+
+        settingsBtn.addEventListener('click', () => {
+            const isHidden = settingsPanel.style.display === 'none';
+            settingsPanel.style.display = isHidden ? 'flex' : 'none';
+        });
+
+        chrome.storage.local.get(['claudeApiKey'], (result) => {
+            if (result.claudeApiKey) {
+                apiKeyInput.value = result.claudeApiKey;
+            }
+        });
+
+        saveApiKeyBtn.addEventListener('click', () => {
+            const key = apiKeyInput.value.trim();
+            chrome.storage.local.set({ claudeApiKey: key }, () => {
+                settingsStatus.textContent = key ? 'Key saved.' : 'Key cleared.';
+                setTimeout(() => { settingsStatus.textContent = ''; }, 2500);
+            });
+        });
+    }
+
+    // ─── AI Study Tools ───────────────────────────────────────────
+    function initAiTools() {
+        if (!modeChips) return;
+
+        modeChips.forEach(chip => {
+            chip.addEventListener('click', () => {
+                modeChips.forEach(c => c.classList.remove('on'));
+                chip.classList.add('on');
+                aiMode = chip.dataset.mode;
+                if (aiCountRow) {
+                    aiCountRow.style.display = aiMode === 'summary' ? 'none' : 'flex';
+                }
+            });
+        });
+
+        if (generateBtn) {
+            generateBtn.addEventListener('click', handleGenerate);
+        }
+    }
+
+    async function handleGenerate() {
+        if (!extractedData || extractedData.questions.length === 0) {
+            aiStatus.textContent = 'Extract questions first.';
+            return;
+        }
+
+        const { claudeApiKey } = await chrome.storage.local.get(['claudeApiKey']);
+        if (!claudeApiKey) {
+            aiStatus.textContent = 'Add a Claude API key in Settings first.';
+            return;
+        }
+
+        generateBtn.disabled = true;
+        generateBtn.classList.add('loading');
+        aiStatus.textContent = 'Generating…';
+        aiOutput.style.display = 'none';
+
+        try {
+            const count = aiCount ? Math.min(20, Math.max(1, parseInt(aiCount.value, 10) || 5)) : 5;
+            const prompt = buildAiPrompt(aiMode, extractedData, count);
+
+            const response = await fetch('https://api.anthropic.com/v1/messages', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-api-key': claudeApiKey,
+                    'anthropic-version': '2023-06-01',
+                    'anthropic-dangerous-direct-browser-access': 'true'
+                },
+                body: JSON.stringify({
+                    model: 'claude-3-5-haiku-20241022',
+                    max_tokens: 2048,
+                    messages: [{ role: 'user', content: prompt }]
+                })
+            });
+
+            if (!response.ok) {
+                const errBody = await response.json().catch(() => ({}));
+                throw new Error(errBody?.error?.message || `Request failed (${response.status})`);
+            }
+
+            const data = await response.json();
+            const text = (data.content || []).map(block => block.text || '').join('\n').trim();
+
+            aiOutput.textContent = text || 'No output returned.';
+            aiOutput.style.display = 'block';
+            aiStatus.textContent = '';
+        } catch (error) {
+            aiStatus.textContent = 'Generation failed: ' + error.message;
+        } finally {
+            generateBtn.disabled = false;
+            generateBtn.classList.remove('loading');
+        }
+    }
+
+    function buildAiPrompt(mode, data, count) {
+        const questionBlock = data.questions.map(q => {
+            let block = `Question ${q.number}: ${q.text}`;
+            if (q.choices && q.choices.length > 0) {
+                block += '\n' + q.choices.map(c => `  ${c.letter}) ${c.text}`).join('\n');
+            }
+            return block;
+        }).join('\n\n');
+
+        const courseLabel = formatCourseLabel(data.course);
+
+        if (mode === 'flashcards') {
+            return `You are helping a student studying ${courseLabel}. Based on the following multiple-choice questions, ` +
+                `generate ${count} flashcards (term/concept on one line, definition/explanation on the next) covering the key ` +
+                `concepts being tested. Format each as "Q: ...\\nA: ...". Do not repeat the source questions verbatim.\n\n${questionBlock}`;
+        }
+
+        if (mode === 'summary') {
+            return `You are helping a student studying ${courseLabel}. Based on the following multiple-choice questions, ` +
+                `write a concise concept summary of the key ideas being tested, organized with short headings and bullet points.\n\n${questionBlock}`;
+        }
+
+        return `You are helping a student studying ${courseLabel}. Based on the following multiple-choice questions, ` +
+            `write ${count} new multiple-choice practice questions that test the same concepts, at a similar difficulty. ` +
+            `Include four answer choices (A-D) and mark the correct answer for each.\n\n${questionBlock}`;
+    }
 
     // ─── Initialize ──────────────────────────────────────────────
     async function init() {
+        initSettings();
+        initAiTools();
         try {
             const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
@@ -312,6 +453,7 @@
         extractBtn.style.display = 'none';
         resultsSection.style.display = 'flex';
         resultsCount.textContent = extractedData.questions.length;
+        if (aiPanel) aiPanel.style.display = 'block';
 
         previewBox.innerHTML = '';
         // Show all questions in preview
@@ -412,7 +554,7 @@
 
         let output = '';
         output += `${separator}\n`;
-        output += `  COLLEGEBOARD NEXUS — Question Export\n`;
+        output += `  NIB — Question Export\n`;
         output += `  ${data.title || 'Untitled Assignment'}\n`;
         if (data.course) {
             output += `  Course: ${formatCourseLabel(data.course)}\n`;
@@ -456,7 +598,7 @@
 
         output += `\n${separator}\n`;
         output += `  Total Questions: ${data.questions.length}\n`;
-        output += `  Exported by CollegeBoard Nexus\n`;
+        output += `  Exported by Nib\n`;
         output += `  ${data.url || ''}\n`;
         output += `${separator}\n`;
 

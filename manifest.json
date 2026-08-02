@@ -1,15 +1,15 @@
 {
   "manifest_version": 3,
-  "name": "CollegeBoard Nexus",
-  "version": "1.0.1",
-  "description": "Extract and export questions from AP Classroom, and hide answers while studying",
+  "name": "Nib",
+  "version": "1.1.0",
+  "description": "Export AP Classroom multiple-choice questions to text, hide answer markers while studying, and generate AI study material",
   "permissions": [
     "activeTab",
     "scripting",
     "storage"
   ],
   "host_permissions": [
-    "https://integrate.api.nvidia.com/*"
+    "https://api.anthropic.com/*"
   ],
   "action": {
     "default_popup": "popup.html",

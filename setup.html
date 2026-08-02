@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Setup | Nib</title>
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230b1426'/%3E%3Cg stroke='%238ab4ff' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M10 23V9'/%3E%3Cpath d='M22 9v14'/%3E%3Cpath d='M10 9l12 14'/%3E%3C/g%3E%3Ccircle cx='10' cy='9' r='3.2' fill='%238ab4ff'/%3E%3Ccircle cx='22' cy='23' r='3.2' fill='%238ab4ff'/%3E%3C/svg%3E">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-deep: #050912;
+      --navy-surface: #0b1426;
+      --navy-raised: #111d33;
+      --navy-line: rgba(138, 180, 255, 0.14);
+
+      --text-bright: #eef3fc;
+      --text-muted: #8b99b4;
+
+      --accent-ice: #8ab4ff;
+      --accent-blue: #4d7cf0;
+      --accent-deep: #24417f;
+
+      --font-ui: 'Instrument Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
+      --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg-deep);
+      color: var(--text-bright);
+      font-family: var(--font-ui);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      -webkit-font-smoothing: antialiased;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Softer background than the landing page: one blade, low opacity */
+    .glow {
+      position: fixed;
+      top: -20%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90vw;
+      height: 50vh;
+      background: radial-gradient(ellipse at center, var(--accent-deep) 0%, transparent 70%);
+      filter: blur(120px);
+      opacity: 0.55;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    /* --- Logo --- */
+    .logo-mark { width: 22px; height: 22px; flex-shrink: 0; }
+    .logo-mark .node { fill: var(--accent-ice); }
+    .logo-mark .edge { stroke: var(--accent-ice); stroke-width: 2.4; stroke-linecap: round; fill: none; }
+    .logo-mark .edge-dim { stroke: var(--accent-ice); stroke-width: 2.4; stroke-linecap: round; fill: none; opacity: 0.4; }
+
+    /* --- Nav --- */
+    .pill-nav {
+      position: fixed;
+      top: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: max-content;
+      min-width: 640px;
+      background: rgba(11, 20, 38, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--navy-line);
+      border-radius: 40px;
+      padding: 8px 16px 8px 20px;
+      z-index: 100;
+    }
+
+    .nav-brand {
+      display: flex; align-items: center; gap: 10px;
+      color: var(--text-bright);
+      font-weight: 600; font-size: 16px;
+      letter-spacing: -0.2px; text-decoration: none;
+    }
+
+    .nav-links { display: flex; gap: 22px; }
+    .nav-links a { color: var(--text-muted); text-decoration: none; font-size: 14px; font-weight: 500; transition: color .2s; }
+    .nav-links a:hover, .nav-links a.current { color: var(--text-bright); }
+
+    .nav-download {
+      display: flex; align-items: center; gap: 7px;
+      background: rgba(255,255,255,0.94); color: #0b1426;
+      padding: 6px 14px; border-radius: 20px;
+      font-size: 13px; font-weight: 500; text-decoration: none;
+    }
+    .nav-download svg { width: 15px; height: 15px; fill: #0b1426; }
+
+    /* --- Layout --- */
+    .page {
+      width: 100%;
+      max-width: 760px;
+      padding: 150px 24px 100px;
+    }
+
+    .page-header { margin-bottom: 56px; }
+
+    .kicker {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--accent-ice);
+      margin-bottom: 14px;
+      display: block;
+    }
+
+    h1 {
+      font-size: 44px;
+      font-weight: 600;
+      letter-spacing: -1.2px;
+      line-height: 1.1;
+      margin-bottom: 16px;
+    }
+
+    .lede { font-size: 17px; color: var(--text-muted); line-height: 1.6; max-width: 620px; }
+
+    h2 {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--accent-ice);
+      padding-top: 22px;
+      border-top: 1px solid var(--navy-line);
+      margin-bottom: 28px;
+    }
+
+    section { margin-bottom: 60px; }
+
+    /* --- Steps --- */
+    .step { display: flex; gap: 18px; margin-bottom: 26px; }
+
+    .step-num {
+      flex-shrink: 0;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      border: 1px solid var(--navy-line);
+      background: var(--navy-raised);
+      color: var(--accent-ice);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      display: flex; align-items: center; justify-content: center;
+      margin-top: 1px;
+    }
+
+    .step-body h3 { font-size: 16px; font-weight: 600; margin-bottom: 6px; letter-spacing: -0.2px; }
+    .step-body p { font-size: 14px; line-height: 1.65; color: var(--text-muted); }
+    .step-body p + p { margin-top: 8px; }
+
+    code {
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      background: var(--navy-raised);
+      border: 1px solid var(--navy-line);
+      border-radius: 5px;
+      padding: 2px 6px;
+      color: var(--accent-ice);
+    }
+
+    pre {
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      line-height: 1.9;
+      background: var(--navy-surface);
+      border: 1px solid var(--navy-line);
+      border-radius: 10px;
+      padding: 14px 16px;
+      color: var(--text-muted);
+      overflow-x: auto;
+      margin-top: 12px;
+    }
+
+    pre .k { color: var(--accent-ice); }
+
+    a.inline { color: var(--accent-ice); text-decoration: none; border-bottom: 1px solid rgba(138,180,255,0.35); }
+    a.inline:hover { border-bottom-color: var(--accent-ice); }
+
+    /* --- Callout --- */
+    .callout {
+      background: var(--navy-surface);
+      border: 1px solid var(--navy-line);
+      border-left: 2px solid var(--accent-blue);
+      border-radius: 0 10px 10px 0;
+      padding: 16px 18px;
+      margin-top: 18px;
+    }
+
+    .callout strong { display: block; font-size: 14px; margin-bottom: 5px; }
+    .callout p { font-size: 13.5px; line-height: 1.6; color: var(--text-muted); }
+
+    /* --- Limits list --- */
+    .limits { list-style: none; }
+    .limits li {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text-muted);
+      padding: 12px 0 12px 22px;
+      border-bottom: 1px solid var(--navy-line);
+      position: relative;
+    }
+    .limits li:first-child { padding-top: 0; }
+    .limits li::before {
+      content: "";
+      position: absolute;
+      left: 2px; top: 20px;
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--accent-blue);
+    }
+    .limits li:first-child::before { top: 8px; }
+
+    /* --- Troubleshooting --- */
+    .trouble { border-top: 1px solid var(--navy-line); }
+    .trouble-row { padding: 18px 0; border-bottom: 1px solid var(--navy-line); }
+    .trouble-q { font-size: 15px; font-weight: 500; margin-bottom: 7px; }
+    .trouble-a { font-size: 13.5px; line-height: 1.65; color: var(--text-muted); }
+
+    .footer-note {
+      font-size: 12px;
+      color: rgba(139,153,180,0.6);
+      line-height: 1.6;
+      border-top: 1px solid var(--navy-line);
+      padding-top: 22px;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 14px;
+      color: var(--text-muted);
+      text-decoration: none;
+      margin-bottom: 40px;
+    }
+    .back-link:hover { color: var(--text-bright); }
+
+    @media (max-width: 768px) {
+      .pill-nav { min-width: calc(100% - 32px); width: calc(100% - 32px); padding: 10px 12px; }
+      .nav-links { display: none; }
+      .page { padding: 120px 20px 80px; }
+      h1 { font-size: 32px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="glow"></div>
+
+  <nav class="pill-nav">
+    <a href="nib.html" class="nav-brand">
+      <svg class="logo-mark" viewBox="0 0 32 32" aria-hidden="true">
+        <path class="edge" d="M9 24V8"/><path class="edge" d="M23 8v16"/><path class="edge-dim" d="M9 8l14 16"/>
+        <circle class="node" cx="9" cy="8" r="3.4"/><circle class="node" cx="23" cy="24" r="3.4"/>
+      </svg>
+      Nib
+    </a>
+    <div class="nav-links">
+      <a href="nib.html#features">Features</a>
+      <a href="#install" class="current">Install</a>
+      <a href="#usage">Usage</a>
+      <a href="#limits">Limits</a>
+    </div>
+    <a href="https://github.com/puria1234/collegeboard-nexus" class="nav-download">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+      GitHub
+    </a>
+  </nav>
+
+  <div class="page">
+
+    <a href="nib.html" class="back-link">&larr; Back to Nib</a>
+
+    <div class="page-header">
+      <span class="kicker">Setup guide</span>
+      <h1>Get Nib running in about five minutes.</h1>
+      <p class="lede">
+        Nib is not on the Chrome Web Store yet, so you install it the developer way: download the folder, turn on one setting, and point Chrome at it. Nothing here requires knowing how to code.
+      </p>
+    </div>
+
+    <!-- INSTALL -->
+    <section id="install">
+      <h2>Install the extension</h2>
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h3>Download the folder</h3>
+          <p>On the <a class="inline" href="https://github.com/puria1234/collegeboard-nexus">GitHub page</a>, click the green Code button, then Download ZIP. Unzip it somewhere you will not accidentally delete, like Documents. Not Downloads, since the extension breaks if the folder moves.</p>
+          <p>If you use git, clone it instead:</p>
+          <pre><span class="k">git clone</span> https://github.com/puria1234/collegeboard-nexus</pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h3>Open your extensions page</h3>
+          <p>Paste the address for your browser into the address bar:</p>
+          <pre>Chrome &nbsp;<span class="k">chrome://extensions</span>
+Edge &nbsp;&nbsp;&nbsp;<span class="k">edge://extensions</span>
+Brave &nbsp;&nbsp;<span class="k">brave://extensions</span></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h3>Turn on Developer mode</h3>
+          <p>The toggle sits in the top right corner of that page. Without it, the Load unpacked button in the next step stays hidden.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h3>Load unpacked</h3>
+          <p>Click <strong>Load unpacked</strong> and select the project folder. Pick the folder that contains <code>manifest.json</code> directly. A common mistake is selecting the outer folder from the ZIP, which holds another folder inside it.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <h3>Pin it to your toolbar</h3>
+          <p>Nib should now appear in your extensions list. Click the puzzle piece icon in the toolbar and pin Nib so the icon is always visible.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- API KEY -->
+    <section id="key">
+      <h2>Add your Claude API key</h2>
+
+      <p class="lede" style="font-size:15px;margin-bottom:26px;">
+        Only needed for the AI study tools. Extracting questions and the Answer Hider both work without a key.
+      </p>
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h3>Create a key</h3>
+          <p>Sign in at <a class="inline" href="https://console.anthropic.com">console.anthropic.com</a> and create an API key under API Keys. Copy it when it appears, since the console will not show it to you again.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h3>Paste it into Nib</h3>
+          <p>Open the popup, click the gear icon in the top right, and paste the key into Settings. It is saved in your browser's local storage and is never sent anywhere except to Anthropic when you generate something.</p>
+        </div>
+      </div>
+
+      <div class="callout">
+        <strong>API usage costs money</strong>
+        <p>Claude API keys are billed per use, separately from a Claude subscription. Generating flashcards for one unit costs a fraction of a cent, but set a spending limit in the console so a runaway loop cannot surprise you.</p>
+      </div>
+    </section>
+
+    <!-- USAGE -->
+    <section id="usage">
+      <h2>Using it</h2>
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h3>Open a question page</h3>
+          <p>Go to an AP Classroom assignment or quiz that shows multiple-choice questions. The popup only activates on <code>apclassroom.collegeboard.org</code>, so on any other site the buttons stay greyed out.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h3>Pick your course</h3>
+          <p>Click the Nib icon and choose your course from the dropdown. This is required before extraction, because it tells Nib how to label the export.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h3>Optional: turn on Answer Hider</h3>
+          <p>Flip the toggle to cover the correct and incorrect markers so a graded review page works as fresh practice. A small floating panel also appears on the page itself if you want to toggle it without reopening the popup.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h3>Extract and download</h3>
+          <p>Hit Extract questions. Nib shows you what it found, including any questions whose answer choices are images rather than text. If the count looks right, click Download to save a <code>.txt</code>.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <h3>Optional: generate study material</h3>
+          <p>Under AI study tools, pick a mode: similar questions, flashcards, or a concept summary. Choose a count where it applies, then click Generate. Output appears in the popup for you to copy.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- LIMITS -->
+    <section id="limits">
+      <h2>What it will not do</h2>
+      <ul class="limits">
+        <li>Only multiple-choice questions are supported. Free response and other formats are skipped.</li>
+        <li>When answer choices are images, the export notes that they could not be pulled out as text rather than dropping them silently.</li>
+        <li>The popup stays inactive anywhere outside <code>apclassroom.collegeboard.org</code>.</li>
+        <li>Nothing syncs. Your key and settings live in one browser profile on one computer.</li>
+      </ul>
+    </section>
+
+    <!-- TROUBLESHOOTING -->
+    <section id="troubleshooting">
+      <h2>If something breaks</h2>
+      <div class="trouble">
+        <div class="trouble-row">
+          <div class="trouble-q">The popup opens but everything is greyed out</div>
+          <div class="trouble-a">You are not on an AP Classroom page, or the page loaded before the extension did. Refresh the tab and reopen the popup.</div>
+        </div>
+        <div class="trouble-row">
+          <div class="trouble-q">Load unpacked says the manifest is missing</div>
+          <div class="trouble-a">You selected a folder one level too high. Open it, and if you see another folder rather than <code>manifest.json</code>, select that inner one instead.</div>
+        </div>
+        <div class="trouble-row">
+          <div class="trouble-q">Extract finds zero questions</div>
+          <div class="trouble-a">The questions may not have finished rendering. Scroll through the whole set so every question loads, then try again.</div>
+        </div>
+        <div class="trouble-row">
+          <div class="trouble-q">AI generation fails with a CORS error</div>
+          <div class="trouble-a">Calls to the Anthropic API from a browser extension need the <code>anthropic-dangerous-direct-browser-access</code> header set to true. If you built from source and stripped it out, add it back.</div>
+        </div>
+        <div class="trouble-row">
+          <div class="trouble-q">The extension vanished after a restart</div>
+          <div class="trouble-a">Unpacked extensions unload if their folder is moved, renamed, or deleted. Put the folder back where it was and reload it from the extensions page.</div>
+        </div>
+      </div>
+    </section>
+
+    <p class="footer-note">
+      Nib is an independent open-source project. Not affiliated with, endorsed by, or connected to the College Board.
+      Exported questions are College Board material, so keep them to yourself and use Nib in line with your school's academic integrity policy.
+    </p>
+
+  </div>
+
+</body>
+</html>

@@ -1,5 +1,5 @@
 /**
- * CollegeBoard Nexus — Answer Hider
+ * Nib — Answer Hider
  *
  * Based on the AP Classroom Answer Hider app.
  * Injects CSS to hide correct/incorrect indicators and provides a
@@ -174,7 +174,7 @@
 
     const title = document.createElement('span');
     title.className = 'cbh-title';
-    title.textContent = 'Nexus Hider';
+    title.textContent = 'Nib Hider';
     panel.appendChild(title);
 
     const toggleWrap = document.createElement('label');
