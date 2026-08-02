@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nib | Study tools for AP Classroom</title>
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230b1426'/%3E%3Cg stroke='%238ab4ff' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M10 23V9'/%3E%3Cpath d='M22 9v14'/%3E%3Cpath d='M10 9l12 14'/%3E%3C/g%3E%3Ccircle cx='10' cy='9' r='3.2' fill='%238ab4ff'/%3E%3Ccircle cx='22' cy='23' r='3.2' fill='%238ab4ff'/%3E%3C/svg%3E">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-deep: #050912;
+      --navy-surface: #0b1426;
+      --navy-raised: #111d33;
+      --navy-line: rgba(138, 180, 255, 0.14);
+
+      --text-bright: #eef3fc;
+      --text-muted: #8b99b4;
+
+      --accent-ice: #8ab4ff;
+      --accent-blue: #4d7cf0;
+      --accent-deep: #24417f;
+
+      --font-ui: 'Instrument Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
+      --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+      --keycap-bg: #e8ecf5;
+      --keycap-text: #172033;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg-deep);
+      color: var(--text-bright);
+      font-family: var(--font-ui);
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* --- Aurora Background --- */
+    .aurora-container {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      overflow: hidden;
+      pointer-events: none;
+      background: var(--bg-deep);
+    }
+
+    .aurora-blade {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(130px);
+      mix-blend-mode: screen;
+      opacity: 0.6;
+      will-change: transform, opacity;
+    }
+
+    .blade-1 {
+      top: -10%; left: 10%;
+      width: 60vw; height: 40vh;
+      background: radial-gradient(ellipse at center, var(--accent-blue) 0%, var(--accent-deep) 55%, transparent 80%);
+      animation: drift-1 18s ease-in-out infinite alternate, breathe 15s ease-in-out infinite alternate;
+      transform-origin: center;
+    }
+
+    .blade-2 {
+      top: 30%; right: -5%;
+      width: 50vw; height: 60vh;
+      background: radial-gradient(ellipse at center, var(--accent-ice) 0%, var(--accent-deep) 60%, transparent 80%);
+      animation: drift-2 22s ease-in-out infinite alternate-reverse, breathe 19s ease-in-out infinite alternate;
+    }
+
+    .blade-3 {
+      bottom: -10%; left: 20%;
+      width: 70vw; height: 30vh;
+      background: radial-gradient(ellipse at center, var(--accent-deep) 0%, var(--accent-blue) 70%, transparent 100%);
+      animation: drift-3 20s ease-in-out infinite alternate, breathe 17s ease-in-out infinite alternate;
+    }
+
+    @keyframes drift-1 { 0% { transform: translate(0,0) rotate(0deg); } 100% { transform: translate(10vw,5vh) rotate(10deg); } }
+    @keyframes drift-2 { 0% { transform: translate(0,0) rotate(0deg); } 100% { transform: translate(-8vw,-10vh) rotate(-15deg); } }
+    @keyframes drift-3 { 0% { transform: translate(0,0) rotate(0deg); } 100% { transform: translate(15vw,-5vh) rotate(5deg); } }
+    @keyframes breathe { 0% { opacity: 0.6; transform: scale(1); } 100% { opacity: 0.32; transform: scale(1.1); } }
+
+    .film-grain {
+      position: absolute;
+      inset: 0;
+      opacity: 0.3;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+      mix-blend-mode: overlay;
+    }
+
+    .vignette {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, transparent 30%, var(--bg-deep) 100%);
+      pointer-events: none;
+    }
+
+    /* --- Logo Mark --- */
+    .logo-mark { width: 22px; height: 22px; flex-shrink: 0; }
+    .logo-mark .node { fill: var(--accent-ice); }
+    .logo-mark .edge { stroke: var(--accent-ice); stroke-width: 2.4; stroke-linecap: round; fill: none; }
+    .logo-mark .edge-dim { stroke: var(--accent-ice); stroke-width: 2.4; stroke-linecap: round; fill: none; opacity: 0.4; }
+
+    /* --- Nav --- */
+    .pill-nav {
+      position: fixed;
+      top: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: max-content;
+      min-width: 720px;
+      background: rgba(11, 20, 38, 0.55);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--navy-line);
+      border-radius: 40px;
+      padding: 8px 16px 8px 20px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      z-index: 100;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--text-bright);
+      font-weight: 600;
+      font-size: 16px;
+      letter-spacing: -0.2px;
+      text-decoration: none;
+    }
+
+    .nav-links { display: flex; gap: 24px; }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--text-bright); }
+
+    .nav-actions { display: flex; align-items: center; gap: 16px; }
+
+    .nav-download {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(255, 255, 255, 0.94);
+      color: #0b1426;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+      text-decoration: none;
+    }
+
+    .nav-download svg { width: 15px; height: 15px; fill: #0b1426; }
+
+    /* --- Hero --- */
+    .hero-container {
+      width: 100%;
+      max-width: 1440px;
+      padding: 160px 24px 60px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      z-index: 10;
+    }
+
+    .hero-logo { width: 60px; height: 60px; margin-bottom: 28px; }
+
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-muted);
+      background: rgba(138, 180, 255, 0.07);
+      border: 1px solid var(--navy-line);
+      padding: 6px 12px;
+      border-radius: 20px;
+      margin-bottom: 24px;
+    }
+
+    .hero-title {
+      font-size: 64px !important;
+      font-weight: 600;
+      line-height: 1.08;
+      color: var(--text-bright);
+      margin-bottom: 24px;
+      letter-spacing: -1.5px;
+    }
+
+    .accent-word {
+      background: linear-gradient(to right, #ffffff, var(--accent-ice));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      padding-right: 4px;
+    }
+
+    .hero-subtitle {
+      font-size: 18px;
+      color: var(--text-muted);
+      max-width: 620px;
+      line-height: 1.55;
+      margin-bottom: 40px;
+    }
+
+    /* --- Keycaps --- */
+    .button-row { display: flex; gap: 20px; margin-bottom: 16px; }
+
+    .keycap-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--keycap-bg);
+      color: var(--keycap-text);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: 8px;
+      padding: 12px 18px;
+      box-shadow:
+        0 0 0 2px rgba(5, 9, 18, 0.9),
+        0 0 16px rgba(138, 180, 255, 0.22),
+        inset 0 1px 1px rgba(255, 255, 255, 0.8),
+        inset 0 -1.5px 2px rgba(23, 32, 51, 0.35);
+      transition: transform 0.1s;
+    }
+
+    .keycap-btn:active {
+      transform: translateY(2px);
+      box-shadow:
+        0 0 0 2px rgba(5, 9, 18, 0.9),
+        0 0 8px rgba(138, 180, 255, 0.12),
+        inset 0 1px 1px rgba(255, 255, 255, 0.4),
+        inset 0 -1px 1px rgba(23, 32, 51, 0.2);
+    }
+
+    .keycap-btn.secondary {
+      background: transparent;
+      color: var(--text-muted);
+      box-shadow: 0 0 0 1px rgba(138, 180, 255, 0.25);
+    }
+
+    .keycap-btn.secondary svg { stroke: var(--text-muted); }
+
+    .keycap-btn svg {
+      width: 17px; height: 17px;
+      stroke: var(--keycap-text);
+      stroke-width: 2;
+      fill: none;
+    }
+
+    .install-caption {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 64px;
+    }
+
+    /* --- Popup Mockup (matches the real extension popup) --- */
+    .popup-frame {
+      width: 100%;
+      max-width: 400px;
+      background: var(--navy-surface);
+      border: 1px solid var(--navy-line);
+      border-radius: 14px;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.65), 0 0 50px rgba(77, 124, 240, 0.14);
+      overflow: hidden;
+      text-align: left;
+      margin-bottom: 20px;
+    }
+
+    .popup-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--navy-line);
+    }
+
+    .popup-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: -0.2px;
+      color: var(--text-bright);
+    }
+
+    .popup-title .logo-mark { width: 16px; height: 16px; }
+
+    .popup-gear { width: 15px; height: 15px; stroke: var(--text-muted); stroke-width: 2; fill: none; }
+
+    .popup-body { padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 14px; }
+
+    .field-label {
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .select-mock {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--navy-raised);
+      border: 1px solid var(--navy-line);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 13px;
+      color: var(--text-bright);
+    }
+
+    .select-mock span:last-child { color: var(--text-muted); font-size: 11px; }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--navy-raised);
+      border: 1px solid var(--navy-line);
+      border-radius: 8px;
+      padding: 11px 12px;
+    }
+
+    .toggle-copy { display: flex; flex-direction: column; gap: 2px; }
+    .toggle-name { font-size: 13px; color: var(--text-bright); font-weight: 500; }
+    .toggle-hint { font-size: 11px; color: var(--text-muted); }
+
+    .switch {
+      width: 34px; height: 19px;
+      border-radius: 12px;
+      background: var(--accent-blue);
+      position: relative;
+      flex-shrink: 0;
+      box-shadow: 0 0 12px rgba(77, 124, 240, 0.5);
+    }
+
+    .switch::after {
+      content: "";
+      position: absolute;
+      top: 2px; right: 2px;
+      width: 15px; height: 15px;
+      border-radius: 50%;
+      background: #fff;
+    }
+
+    .btn-primary {
+      display: block;
+      width: 100%;
+      text-align: center;
+      background: linear-gradient(to bottom, var(--accent-blue), #3a63cf);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 11px;
+      border-radius: 8px;
+      text-decoration: none;
+      box-shadow: 0 2px 12px rgba(77, 124, 240, 0.35);
+    }
+
+    .preview-box {
+      border: 1px solid var(--navy-line);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .preview-head {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--accent-ice);
+      padding: 8px 12px;
+      background: rgba(138, 180, 255, 0.09);
+      border-bottom: 1px solid var(--navy-line);
+    }
+
+    .preview-lines {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      line-height: 1.9;
+      color: var(--text-muted);
+      padding: 10px 12px;
+    }
+
+    .chip-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .chip {
+      font-size: 12px;
+      color: var(--text-muted);
+      border: 1px solid var(--navy-line);
+      border-radius: 16px;
+      padding: 6px 11px;
+    }
+
+    .chip.on {
+      color: #fff;
+      border-color: var(--accent-blue);
+      background: rgba(77, 124, 240, 0.28);
+      font-weight: 500;
+    }
+
+    .popup-footer {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: rgba(139, 153, 180, 0.75);
+      padding: 10px 18px;
+      background: rgba(0, 0, 0, 0.25);
+      border-top: 1px solid var(--navy-line);
+    }
+
+    .mock-caption {
+      font-size: 12px;
+      color: rgba(139, 153, 180, 0.8);
+      margin-bottom: 44px;
+    }
+
+    /* --- Features --- */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      width: 100%;
+      max-width: 900px;
+      text-align: left;
+      margin-bottom: 48px;
+    }
+
+    .feature {
+      border-top: 1px solid var(--navy-line);
+      padding-top: 16px;
+    }
+
+    .feature h3 {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.2px;
+      color: var(--text-bright);
+      margin-bottom: 8px;
+    }
+
+    .feature p {
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--text-muted);
+    }
+
+    .ghost-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 16px;
+      border: 1px solid rgba(138, 180, 255, 0.3);
+      border-radius: 20px;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .ghost-pill:hover { border-color: var(--accent-ice); color: var(--text-bright); }
+
+    .legal-note {
+      font-size: 11px;
+      color: rgba(139, 153, 180, 0.6);
+      margin-top: 36px;
+      max-width: 520px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 768px) {
+      .pill-nav { min-width: calc(100% - 48px); width: calc(100% - 48px); padding: 12px; }
+      .nav-links { display: none; }
+      .hero-title { font-size: 42px !important; }
+      .button-row { flex-direction: column; width: 100%; max-width: 320px; }
+      .keycap-btn { justify-content: center; }
+      .feature-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .aurora-blade { animation: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="aurora-container">
+    <div class="aurora-blade blade-1"></div>
+    <div class="aurora-blade blade-2"></div>
+    <div class="aurora-blade blade-3"></div>
+    <div class="film-grain"></div>
+    <div class="vignette"></div>
+  </div>
+
+  <nav class="pill-nav">
+    <a href="#" class="nav-brand">
+      <svg class="logo-mark" viewBox="0 0 32 32" aria-hidden="true">
+        <path class="edge" d="M9 24V8"/>
+        <path class="edge" d="M23 8v16"/>
+        <path class="edge-dim" d="M9 8l14 16"/>
+        <circle class="node" cx="9" cy="8" r="3.4"/>
+        <circle class="node" cx="23" cy="24" r="3.4"/>
+      </svg>
+      Nib
+    </a>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="setup.html#install">Install</a>
+      <a href="setup.html#usage">Usage</a>
+      <a href="#">Source</a>
+    </div>
+    <div class="nav-actions">
+      <a href="https://github.com/puria1234/collegeboard-nexus" class="nav-download">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+        GitHub
+      </a>
+    </div>
+  </nav>
+
+  <main class="hero-container">
+    <svg class="logo-mark hero-logo" viewBox="0 0 32 32" aria-label="Nib">
+      <path class="edge" d="M9 24V8"/>
+      <path class="edge" d="M23 8v16"/>
+      <path class="edge-dim" d="M9 8l14 16"/>
+      <circle class="node" cx="9" cy="8" r="3.4"/>
+      <circle class="node" cx="23" cy="24" r="3.4"/>
+    </svg>
+
+    <span class="eyebrow">apclassroom.collegeboard.org</span>
+
+    <h1 class="hero-title">
+      Take your AP Classroom<br>practice <span class="accent-word">offline</span>.
+    </h1>
+
+    <p class="hero-subtitle">
+      Nib is a browser extension for AP Classroom. Export a multiple-choice set to a text file, hide the right-or-wrong markers so you can actually think, and turn a unit into flashcards.
+    </p>
+
+    <div class="button-row">
+      <a href="https://github.com/puria1234/collegeboard-nexus" class="keycap-btn">
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+        Download the extension
+      </a>
+      <a href="setup.html" class="keycap-btn secondary">
+        <svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+        How to install
+      </a>
+    </div>
+    <div class="install-caption">Load unpacked in Chrome, Edge, or Brave. Not on any store yet.</div>
+
+    <!-- Popup Mockup -->
+    <div class="popup-frame">
+      <div class="popup-header">
+        <div class="popup-title">
+          <svg class="logo-mark" viewBox="0 0 32 32" aria-hidden="true">
+            <path class="edge" d="M9 24V8"/>
+            <path class="edge" d="M23 8v16"/>
+            <path class="edge-dim" d="M9 8l14 16"/>
+            <circle class="node" cx="9" cy="8" r="3.4"/>
+            <circle class="node" cx="23" cy="24" r="3.4"/>
+          </svg>
+          Nib
+        </div>
+        <svg class="popup-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6h.09A1.65 1.65 0 0 0 10 3.09V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+      </div>
+
+      <div class="popup-body">
+        <div>
+          <span class="field-label">Course</span>
+          <div class="select-mock">
+            <span>AP Biology</span>
+            <span>required</span>
+          </div>
+        </div>
+
+        <div class="toggle-row">
+          <div class="toggle-copy">
+            <span class="toggle-name">Answer Hider</span>
+            <span class="toggle-hint">Hides correct and incorrect markers</span>
+          </div>
+          <div class="switch"></div>
+        </div>
+
+        <a href="#" class="btn-primary">Extract questions</a>
+
+        <div class="preview-box">
+          <div class="preview-head">24 questions ready</div>
+          <div class="preview-lines">
+            Units 3&ndash;4, multiple choice<br>
+            21 pulled out as text<br>
+            3 use image choices, flagged in the file
+          </div>
+        </div>
+
+        <div>
+          <span class="field-label">AI study tools</span>
+          <div class="chip-row">
+            <span class="chip on">Similar questions</span>
+            <span class="chip">Flashcards</span>
+            <span class="chip">Concept summary</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="popup-footer">Needs a Claude API key · stored in your browser only</div>
+    </div>
+    <p class="mock-caption">The popup, on an AP Classroom quiz page.</p>
+
+    <!-- Features -->
+    <div class="feature-grid" id="features">
+      <div class="feature">
+        <h3>Export to text</h3>
+        <p>Pick your course, hit extract, and download the multiple-choice set as a .txt you can study anywhere. Image-based choices get flagged instead of dropped silently.</p>
+      </div>
+      <div class="feature">
+        <h3>Answer Hider</h3>
+        <p>Covers the correct and incorrect indicators so a review page works as practice. Toggle it from the popup or the floating panel on the page.</p>
+      </div>
+      <div class="feature">
+        <h3>AI study tools</h3>
+        <p>Generate similar questions, flashcards, or a concept summary from what you extracted. Bring your own Claude API key; it stays in your browser.</p>
+      </div>
+    </div>
+
+    <a href="setup.html" class="ghost-pill">Read the setup guide &rarr;</a>
+
+    <p class="legal-note">
+      Nib is an independent open-source project. Not affiliated with, endorsed by, or connected to the College Board.
+      Only multiple-choice questions are supported. Use it in line with your school's academic integrity policy.
+    </p>
+  </main>
+
+</body>
+</html>

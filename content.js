@@ -1,5 +1,5 @@
 /**
- * CollegeBoard Nexus — Content Script
+ * Nib — Content Script
  * 
  * Injected into AP Classroom pages AND Learnosity iframes.
  * This script only needs to extract questions from whatever frame it runs in.

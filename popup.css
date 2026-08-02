@@ -22,6 +22,9 @@
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 14px;
+
+  --accent-ice: #8ab4ff;
+  --accent-blue: #4d7cf0;
 }
 
 * {
@@ -96,6 +99,68 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-top: 2px;
+}
+
+/* ─────────────────────────────────────────────────────────
+   SETTINGS
+   ───────────────────────────────────────────────────────── */
+.gear-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+.gear-btn:hover {
+  color: var(--text-title);
+  border-color: var(--border-strong);
+}
+.gear-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.settings-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.settings-input {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border-strong);
+  color: var(--text-title);
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  outline: none;
+}
+.settings-input:focus {
+  border-color: var(--border-focus);
+}
+.settings-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+.settings-actions .btn {
+  width: auto;
+  padding: 8px 16px;
+}
+.settings-status {
+  font-size: 11px;
+  color: var(--accent-ice);
+  min-height: 14px;
 }
 
 /* ─────────────────────────────────────────────────────────
@@ -437,6 +502,33 @@ select:focus {
 }
 .ai-input--count:focus {
   border-color: var(--border-focus);
+}
+
+.chip-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+.chip {
+  font-size: 11px;
+  color: var(--text-muted);
+  background: var(--bg-input);
+  border: 1px solid var(--border-strong);
+  border-radius: 16px;
+  padding: 6px 11px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.chip:hover {
+  color: var(--text-title);
+  border-color: var(--border-focus);
+}
+.chip.on {
+  color: #fff;
+  border-color: var(--accent-blue);
+  background: rgba(77, 124, 240, 0.28);
+  font-weight: 500;
 }
 
 .ai-check {
