@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Lato:wght@400;500;700&display=swap');
 
 :root {
   /* Navy Developer Interface — matches nib-site */
@@ -28,6 +28,7 @@
 
   --font-ui: 'Instrument Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --font-question: 'Lato', 'Segoe UI', system-ui, -apple-system, sans-serif;
 }
 
 * {
@@ -620,6 +621,7 @@ select:focus {
 }
 
 .preview-q-text {
+  font-family: var(--font-question);
   font-size: 12px;
   color: #e4e4e7;
   line-height: 1.5;
@@ -633,6 +635,7 @@ select:focus {
 }
 
 .preview-choice {
+  font-family: var(--font-question);
   font-size: 11px;
   color: var(--text-muted);
   background: var(--bg-input);
