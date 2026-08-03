@@ -88,37 +88,27 @@
     <!-- Results Section -->
     <div class="results" id="resultsSection" style="display: none;">
       <div class="results-header">
-        <div class="results-count-wrapper">
-          <span class="results-label">Questions Found</span>
-          <span class="results-count" id="resultsCount">0</span>
-        </div>
-        <div class="results-actions">
-          <button class="btn btn-download" id="downloadBtn">
-            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
-              <polyline points="7 10 12 15 17 10"/>
-              <line x1="12" y1="15" x2="12" y2="3"/>
-            </svg>
-            Download
-          </button>
-        </div>
+        <span class="results-label" id="resultsLabel">0 questions ready</span>
       </div>
-<div class="preview" id="previewBox"></div>
+      <div class="preview" id="previewBox"></div>
+      <button class="btn btn-download" id="downloadBtn">
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Download
+      </button>
     </div>
 
     <!-- AI Study Tools -->
     <div class="ai-panel" id="aiPanel" style="display: none; margin: 0 24px 24px;">
       <div class="ai-header">
-        <div>
-          <span class="ai-title">AI study tools</span>
-          <span class="ai-subtitle">Generate from what you extracted</span>
-        </div>
-        <span class="ai-badge">Claude</span>
+        <span class="ai-title">AI study tools</span>
       </div>
 
       <div class="ai-grid">
         <div>
-          <span class="ai-label">Mode</span>
           <div class="chip-row">
             <button type="button" class="chip on" data-mode="similar">Similar questions</button>
             <button type="button" class="chip" data-mode="flashcards">Flashcards</button>
@@ -166,13 +156,6 @@
 
     </div> <!-- End mainView -->
 
-
-<!-- Footer -->
-    <footer class="footer">
-      <div class="footer-content">
-        <span class="footer-text">Needs a Claude API key &middot; stored in your browser only</span>
-      </div>
-    </footer>
   </div>
 
   <script src="popup.js"></script>
