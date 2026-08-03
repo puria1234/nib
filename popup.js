@@ -15,7 +15,7 @@
     const infoCard = null; // removed
     const extractBtn = document.getElementById('extractBtn');
     const resultsSection = document.getElementById('resultsSection');
-    const resultsCount = document.getElementById('resultsCount');
+    const resultsLabel = document.getElementById('resultsLabel');
     const previewBox = document.getElementById('previewBox');
     const downloadBtn = document.getElementById('downloadBtn');
     const errorCard = document.getElementById('errorCard');
@@ -452,7 +452,8 @@
     function showResults() {
         extractBtn.style.display = 'none';
         resultsSection.style.display = 'flex';
-        resultsCount.textContent = extractedData.questions.length;
+        const count = extractedData.questions.length;
+        resultsLabel.textContent = `${count} question${count !== 1 ? 's' : ''} ready`;
         if (aiPanel) aiPanel.style.display = 'block';
 
         previewBox.innerHTML = '';
