@@ -216,8 +216,8 @@ select {
   color: var(--text-title);
   padding: 10px 68px 10px 14px;
   border-radius: var(--radius-sm);
-  font-family: var(--font-mono);
-  font-size: 13px;
+  font-family: var(--font-question);
+  font-size: 14px;
   outline: none;
   transition: all 0.2s ease;
   cursor: pointer;
@@ -234,8 +234,8 @@ select:focus {
   right: 14px;
   top: 50%;
   transform: translateY(-50%);
-  font-family: var(--font-mono);
-  font-size: 11px;
+  font-family: var(--font-question);
+  font-size: 13px;
   color: var(--text-muted);
   pointer-events: none;
 }
@@ -422,10 +422,10 @@ select:focus {
 }
 
 .results-label {
-  font-family: var(--font-mono);
-  font-size: 13px;
+  font-family: var(--font-question);
+  font-size: 14px;
   color: var(--accent-ice);
-  font-weight: 500;
+  font-weight: 700;
 }
 
 .results-count {
@@ -701,8 +701,8 @@ select:focus {
 }
 
 .footer-text {
-  font-family: var(--font-mono);
-  font-size: 11px;
+  font-family: var(--font-question);
+  font-size: 12px;
   color: var(--text-muted);
 }
 
