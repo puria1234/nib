@@ -629,11 +629,11 @@ select:focus {
 }
 
 .card-warning {
-  border-color: rgba(245, 158, 11, 0.2);
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.05), transparent);
+  border-color: var(--border-strong);
+  background: var(--bg-card);
 }
 .card-warning .card-title, .card-warning .card-icon {
-  color: #fbbf24;
+  color: var(--text-title);
 }
 
 .card-header {
@@ -656,31 +656,3 @@ select:focus {
   color: var(--text-body);
 }
 
-/* ─────────────────────────────────────────────────────────
-   FOOTER
-   ───────────────────────────────────────────────────────── */
-.footer {
-  margin-top: auto;
-  padding: 16px 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-top: 1px solid var(--border-subtle);
-  background: var(--bg-app);
-}
-
-.footer-text {
-  font-family: var(--font-question);
-  font-size: 12px;
-  color: var(--text-muted);
-}
-
-.footer-version {
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--text-muted);
-  background: var(--bg-input);
-  padding: 2px 6px;
-  border-radius: 4px;
-  border: 1px solid var(--border-subtle);
-}
