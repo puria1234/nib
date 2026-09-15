@@ -1,6 +1,8 @@
 # Nib
 
-Nib is a browser extension for AP Classroom. Export a multiple-choice set to a text file, hide the right-or-wrong markers so you can actually think, and turn a unit into flashcards.
+Nib is a browser extension for AP Classroom. Export a question set to a text file, hide the right-or-wrong markers so you can actually think, and turn a unit into flashcards.
+
+**Beta:** question extraction now covers MCQ and FRQ across all AP courses, not just AP Physics 2 and AP English Language & Composition. Coverage and accuracy may vary by course.
 
 See it in action: `nib.html` (landing page) and `setup.html` (setup guide) in this repo.
 
@@ -36,7 +38,8 @@ API usage is billed per use, separately from a Claude subscription. Set a spendi
 
 ### Notes
 
-- Only multiple-choice questions are supported.
+- MCQ and FRQ are supported, across all AP courses (beta — accuracy may vary by course and page layout).
+- FRQ prompts are extracted as text; the response itself (essay/short-answer box) is never captured.
 - If answer choices are images, the export will note that the choices weren't extractable as text.
 - You must be on `apclassroom.collegeboard.org` for the popup to activate.
 - Your API key is stored in your browser's local storage only; nothing syncs across devices.

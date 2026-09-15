@@ -115,10 +115,24 @@
       course,
       longPromptThreshold: 300,
     };
-    if (course === 'ap_english_language') {
+    // Courses with long reading passages (English, world languages) benefit
+    // from a tighter threshold before splitting stimulus from question text.
+    if (/english|literature|language/i.test(course)) {
       config.longPromptThreshold = 220;
     }
     return config;
+  }
+
+  /**
+   * Detect a free-response (essay/short-answer) input area within a container.
+   */
+  function isFrqContainer(container) {
+    if (!container || !container.querySelector) return false;
+    return !!container.querySelector(
+      '.lrn_response_essay, .lrn-response-essay, [class*="response_essay"], [class*="response-essay"], ' +
+      '.lrn_essay, .lrn-essay, [class*="essay"], [class*="frq"], [class*="free-response"], [class*="free_response"], ' +
+      'textarea, [contenteditable="true"]'
+    );
   }
 
   function splitLongPrompt(text, threshold) {
@@ -207,7 +221,8 @@
         const choiceInfo = extractChoicesFromContainer(parent);
         const choices = choiceInfo.choices;
         const isMcq = choices.length > 0 || choiceInfo.hasImageChoices || choiceInfo.hasMcqOptions;
-        if (isMcq) {
+        const isFrq = !isMcq && isFrqContainer(parent);
+        if (isMcq || isFrq) {
           const split = splitLongPrompt(text, config.longPromptThreshold);
           let questionText = split.questionText || '';
           let stimulus = split.stimulus;
@@ -225,7 +240,7 @@
           questions.push({
             number: index + 1,
             text: questionText || '(Question text not detected)',
-            type: 'MCQ',
+            type: isFrq ? 'FRQ' : 'MCQ',
             choices: choices,
             hasImageChoices: choiceInfo.hasImageChoices,
             hasMcqOptions: choiceInfo.hasMcqOptions,
@@ -279,7 +294,8 @@
     choices.push(...choiceInfo.choices);
 
     const isMcq = choices.length > 0 || hasImageChoices || hasMcqOptions;
-    if (isInstructionText(questionText) && isMcq) {
+    const isFrq = !isMcq && isFrqContainer(container);
+    if (isInstructionText(questionText) && (isMcq || isFrq)) {
       questionText = '';
     }
 
@@ -298,7 +314,7 @@
     }
 
     if (isSettingsText(questionText)) return null;
-    if (!isMcq) return null;
+    if (!isMcq && !isFrq) return null;
     if (!questionText || questionText.length < 10) {
       questionText = '';
     }
@@ -306,7 +322,7 @@
     return {
       number: num,
       text: questionText || '(Question text not detected)',
-      type: 'MCQ',
+      type: isFrq ? 'FRQ' : 'MCQ',
       choices: choices,
       hasImageChoices: hasImageChoices,
       hasMcqOptions: hasMcqOptions,
@@ -490,11 +506,12 @@
         const choiceInfo = extractChoicesFromContainer(container);
         const choices = choiceInfo.choices;
         const isMcq = choices.length > 0 || choiceInfo.hasImageChoices || choiceInfo.hasMcqOptions;
-        if (isMcq) {
+        const isFrq = !isMcq && isFrqContainer(container);
+        if (isMcq || isFrq) {
         questions.push({
           number: index + 1,
           text: text,
-            type: 'MCQ',
+            type: isFrq ? 'FRQ' : 'MCQ',
             choices: choices,
             hasImageChoices: choiceInfo.hasImageChoices,
             hasMcqOptions: choiceInfo.hasMcqOptions,

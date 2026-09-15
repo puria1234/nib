@@ -205,6 +205,12 @@ body {
   letter-spacing: 0.08em;
 }
 
+.course-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
 .select-wrap {
   position: relative;
 }

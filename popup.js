@@ -143,29 +143,31 @@
 
     function buildAiPrompt(mode, data, count) {
         const questionBlock = data.questions.map(q => {
-            let block = `Question ${q.number}: ${q.text}`;
+            let block = `Question ${q.number}${q.type === 'FRQ' ? ' (free response)' : ''}: ${q.text}`;
             if (q.choices && q.choices.length > 0) {
                 block += '\n' + q.choices.map(c => `  ${c.letter}) ${c.text}`).join('\n');
             }
             return block;
         }).join('\n\n');
 
-        const courseLabel = formatCourseLabel(data.course);
+        const courseLabel = data.courseLabel || formatCourseLabel(data.course);
+        const hasFrq = data.questions.some(q => q.type === 'FRQ');
+        const sourceDesc = hasFrq ? 'questions (multiple-choice and free-response)' : 'multiple-choice questions';
 
         if (mode === 'flashcards') {
-            return `You are helping a student studying ${courseLabel}. Based on the following multiple-choice questions, ` +
+            return `You are helping a student studying ${courseLabel}. Based on the following ${sourceDesc}, ` +
                 `generate ${count} flashcards (term/concept on one line, definition/explanation on the next) covering the key ` +
                 `concepts being tested. Format each as "Q: ...\\nA: ...". Do not repeat the source questions verbatim.\n\n${questionBlock}`;
         }
 
         if (mode === 'summary') {
-            return `You are helping a student studying ${courseLabel}. Based on the following multiple-choice questions, ` +
+            return `You are helping a student studying ${courseLabel}. Based on the following ${sourceDesc}, ` +
                 `write a concise concept summary of the key ideas being tested, organized with short headings and bullet points.\n\n${questionBlock}`;
         }
 
-        return `You are helping a student studying ${courseLabel}. Based on the following multiple-choice questions, ` +
-            `write ${count} new multiple-choice practice questions that test the same concepts, at a similar difficulty. ` +
-            `Include four answer choices (A-D) and mark the correct answer for each.\n\n${questionBlock}`;
+        return `You are helping a student studying ${courseLabel}. Based on the following ${sourceDesc}, ` +
+            `write ${count} new practice questions that test the same concepts, at a similar difficulty (multiple-choice with ` +
+            `four answer choices A-D and the correct answer marked, or free-response to match the source type).\n\n${questionBlock}`;
     }
 
     // ─── Initialize ──────────────────────────────────────────────
@@ -340,6 +342,9 @@
             // Execute the extraction function in ALL frames simultaneously.
             // This returns an array of results, one per frame.
             const course = courseSelect ? courseSelect.value : '';
+            const courseLabel = (courseSelect && courseSelect.selectedIndex >= 0)
+                ? courseSelect.options[courseSelect.selectedIndex].text
+                : course;
             if (!course) {
                 setStatus('error', 'Select a course to continue');
                 showError('Please select a course before extracting questions.');
@@ -407,6 +412,7 @@
                 title: tab.title || 'AP Classroom Assignment',
                 url: tab.url,
                 course: course,
+                courseLabel: courseLabel,
                 questions: unique,
                 strategy: strategy,
                 totalFound: unique.length,
@@ -417,9 +423,9 @@
             };
 
             if (unique.length === 0) {
-                setStatus('error', 'No MCQ questions found');
-                let errorMsg = 'No multiple-choice questions were detected. This extension only supports MCQ. ' +
-                    'Open a question with answer choices visible, then try again.';
+                setStatus('error', 'No questions found');
+                let errorMsg = 'No questions were detected. Nib (beta) supports MCQ and FRQ across all AP courses. ' +
+                    'Open a question with answer choices or a free-response prompt visible, then try again.';
 
                 errorMsg += `\n\nScanned ${frameResults.length} frame(s):`;
                 allDebug.forEach((d, i) => {
@@ -478,6 +484,8 @@
                 q.choices.forEach(c => {
                     html += `<div class="preview-choice">${escapeHtml(c.letter)}) ${truncate(c.text, 150)}</div>`;
                 });
+            } else if (q.type === 'FRQ') {
+                html += `<div class="preview-choice" style="font-style: italic;">FRQ (beta) — free-response prompt only, no answer to extract</div>`;
             } else {
                 const isMcq = q.type === 'MCQ' || q.hasMcqOptions || q.hasImageChoices;
                 if (isMcq) {
@@ -487,7 +495,7 @@
                         html += `<div class="preview-choice" style="font-style: italic;">MCQ — answer choices not extractable as text</div>`;
                     }
                 } else {
-                    html += `<div class="preview-choice" style="font-style: italic;">Unsupported — MCQ only</div>`;
+                    html += `<div class="preview-choice" style="font-style: italic;">Unsupported question type</div>`;
                 }
             }
 
@@ -555,16 +563,19 @@
 
         let output = '';
         output += `${separator}\n`;
-        output += `  NIB — Question Export\n`;
+        output += `  NIB — Question Export (Beta)\n`;
         output += `  ${data.title || 'Untitled Assignment'}\n`;
         if (data.course) {
-            output += `  Course: ${formatCourseLabel(data.course)}\n`;
+            output += `  Course: ${data.courseLabel || formatCourseLabel(data.course)}\n`;
+        }
+        if (data.questions.some(q => q.type === 'FRQ')) {
+            output += `  Includes: MCQ & FRQ (beta)\n`;
         }
         output += `  Date: ${dateStr}\n`;
         output += `${separator}\n\n`;
 
         data.questions.forEach((q, index) => {
-            output += `Question ${q.number}\n`;
+            output += `Question ${q.number}${q.type === 'FRQ' ? ' (FRQ)' : ''}\n`;
             output += `${thinSep}\n`;
 
             if (q.stimulus) {
@@ -578,6 +589,8 @@
                 q.choices.forEach(choice => {
                     output += `  ${choice.letter}) ${wordWrap(choice.text, 65).split('\n').join('\n     ')}\n`;
                 });
+            } else if (q.type === 'FRQ') {
+                output += '  [FRQ — free-response prompt only, no answer choices to extract]\n';
             } else {
                 const isMcq = q.type === 'MCQ' || q.hasMcqOptions || q.hasImageChoices;
                 if (isMcq) {
@@ -587,7 +600,7 @@
                         output += '  [MCQ — answer choices not extractable as text]\n';
                     }
                 } else {
-                    output += '  [Unsupported — MCQ only]\n';
+                    output += '  [Unsupported question type]\n';
                 }
             }
 
@@ -638,14 +651,14 @@
     }
 
     function formatCourseLabel(course) {
-        switch (course) {
-            case 'ap_physics_2':
-                return 'AP Physics 2';
-            case 'ap_english_language':
-                return 'AP English Language & Composition';
-            default:
-                return course || 'Unknown';
-        }
+        if (!course) return 'Unknown';
+        if (course === 'ap_other') return 'Other AP course';
+        // Fallback: derive a readable label from the course id, e.g.
+        // "ap_us_government" -> "AP US Government"
+        return course
+            .split('_')
+            .map(word => (word === 'ap' || word.length <= 2 ? word.toUpperCase() : word.charAt(0).toUpperCase() + word.slice(1)))
+            .join(' ');
     }
 
     function setStatus(state, text) {
